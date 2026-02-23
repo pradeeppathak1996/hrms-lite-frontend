@@ -2,35 +2,42 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Dashboard() {
-  const [data, setData] = useState({
-    total_employees: 0,
-    total_attendance: 0,
-    total_present: 0,
-  });
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  const [totalAttendance, setTotalAttendance] = useState(0);
+  const [totalPresent, setTotalPresent] = useState(0);
 
   useEffect(() => {
-    API.get("attendance/dashboard/").then((res) => {
-      setData(res.data);
-    });
+    fetchDashboardData();
   }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const empRes = await API.get("employees/");
+      const attRes = await API.get("attendance/");
+
+      const employees = Array.isArray(empRes.data) ? empRes.data : [];
+      const attendance = Array.isArray(attRes.data) ? attRes.data : [];
+
+      setTotalEmployees(employees.length);
+      setTotalAttendance(attendance.length);
+
+      const presentCount = attendance.filter(
+        (a) => a.status === "Present"
+      ).length;
+
+      setTotalPresent(presentCount);
+    } catch (err) {
+      console.error("Dashboard error", err);
+    }
+  };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Dashboard</h2>
+      <h1>Dashboard</h1>
 
-      <div className="card-container">
-        <div className="card blue">
-          Total Employees: {data.total_employees}
-        </div>
-
-        <div className="card green">
-          Total Present: {data.total_present}
-        </div>
-
-        <div className="card red">
-          Total Attendance: {data.total_attendance}
-        </div>
-      </div>
+      <p>Total Employees: {totalEmployees}</p>
+      <p>Total Present: {totalPresent}</p>
+      <p>Total Attendance: {totalAttendance}</p>
     </div>
   );
 }

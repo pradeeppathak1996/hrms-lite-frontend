@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://hrms-lite-backend-2-44b2.onrender.com/api/",
+  baseURL: process.env.REACT_APP_API_BASE_URL,
 });
 
 export default API;
