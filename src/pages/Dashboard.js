@@ -1,91 +1,66 @@
 import { useEffect, useState } from "react";
-import API from "../api";
+import API from "../api"; // path agar alag ho to adjust karna
 
 function Dashboard() {
-  const [totalEmployees, setTotalEmployees] = useState(0);
-  const [totalAttendance, setTotalAttendance] = useState(0);
-  const [totalPresent, setTotalPresent] = useState(0);
+  const [stats, setStats] = useState({
+    employees: 0,
+    present: 0,
+    attendance: 0,
+  });
 
   useEffect(() => {
-    fetchDashboardData();
+    loadStats();
   }, []);
 
-  const fetchDashboardData = async () => {
+  const loadStats = async () => {
     try {
       const empRes = await API.get("employees/");
       const attRes = await API.get("attendance/");
 
-      const employees = Array.isArray(empRes.data) ? empRes.data : [];
-      const attendance = Array.isArray(attRes.data) ? attRes.data : [];
-
-      setTotalEmployees(employees.length);
-      setTotalAttendance(attendance.length);
+      const employees = empRes.data || [];
+      const attendance = attRes.data || [];
 
       const presentCount = attendance.filter(
         (a) => a.status === "Present"
       ).length;
 
-      setTotalPresent(presentCount);
-    } catch (err) {
-      console.error("Dashboard error", err);
+      setStats({
+        employees: employees.length,
+        present: presentCount,
+        attendance: attendance.length,
+      });
+    } catch (e) {
+      console.error(e);
     }
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h1 style={{ marginBottom: "25px" }}>Dashboard</h1>
+    <div style={{ padding: 30 }}>
+      <h1 style={{ marginBottom: 25 }}>Dashboard</h1>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {/* Total Employees */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #007bff, #00c6ff)",
-            color: "#fff",
-            padding: "20px",
-            borderRadius: "12px",
-            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
-          }}
-        >
-          <h3>Total Employees</h3>
-          <h1>{totalEmployees}</h1>
-        </div>
-
-        {/* Total Present */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #28a745, #7dff9c)",
-            color: "#fff",
-            padding: "20px",
-            borderRadius: "12px",
-            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
-          }}
-        >
-          <h3>Total Present</h3>
-          <h1>{totalPresent}</h1>
-        </div>
-
-        {/* Total Attendance */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #6f42c1, #b28cff)",
-            color: "#fff",
-            padding: "20px",
-            borderRadius: "12px",
-            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
-          }}
-        >
-          <h3>Total Attendance</h3>
-          <h1>{totalAttendance}</h1>
-        </div>
+      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+        <Card title="Total Employees" value={stats.employees} color="#007bff" />
+        <Card title="Total Present" value={stats.present} color="#28a745" />
+        <Card title="Total Attendance" value={stats.attendance} color="#6f42c1" />
       </div>
     </div>
   );
 }
+
+const Card = ({ title, value, color }) => (
+  <div
+    style={{
+      minWidth: 220,
+      padding: 20,
+      borderRadius: 12,
+      background: color,
+      color: "#fff",
+      boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+    }}
+  >
+    <h3>{title}</h3>
+    <h1>{value}</h1>
+  </div>
+);
 
 export default Dashboard;
