@@ -7,26 +7,41 @@ function Attendance() {
   const [employees, setEmployees] = useState([]);
   const [filterDate, setFilterDate] = useState("");
 
-
-  const today = new Date().toLocaleDateString("en-CA"); 
+  const today = new Date().toISOString().split("T")[0];
 
   const [form, setForm] = useState({
     employee: "",
-    date: today,       
+    date: today,
     status: "Present",
   });
 
+  // 🔹 Fetch employees & attendance
   useEffect(() => {
     fetchAttendance();
-    API.get("employees/").then((res) => setEmployees(res.data));
+    fetchEmployees();
   }, []);
 
-  const fetchAttendance = async () => {
-    const res = await API.get("attendance/");
-    setAttendance(res.data);
+  const fetchEmployees = async () => {
+    try {
+      const res = await API.get("employees/");
+      setEmployees(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error(err);
+      alert("Error loading employees");
+    }
   };
 
+  const fetchAttendance = async () => {
+    try {
+      const res = await API.get("attendance/");
+      setAttendance(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error(err);
+      alert("Error loading attendance");
+    }
+  };
 
+  // 🔹 Submit attendance
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -38,36 +53,37 @@ function Attendance() {
     try {
       await API.post("attendance/", form);
       fetchAttendance();
-
       setForm({ employee: "", date: today, status: "Present" });
     } catch (err) {
-      alert(
-        err.response?.data?.non_field_errors?.[0] ||
-        "Error marking attendance"
-      );
+      alert("Error marking attendance");
     }
   };
 
+  // 🔹 Filter by date
   const handleFilter = async () => {
     if (!filterDate) {
       fetchAttendance();
       return;
     }
 
-    const res = await API.get(`attendance/?date=${filterDate}`);
-    setAttendance(res.data);
+    try {
+      const res = await API.get(`attendance/?date=${filterDate}`);
+      setAttendance(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      alert("Error filtering attendance");
+    }
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Mark Attendance</h2>
 
-      {/* ✅ Attendance Form */}
+      {/* ✅ FORM */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
         <select
           value={form.employee}
           onChange={(e) =>
-            setForm({ ...form, employee: parseInt(e.target.value) })
+            setForm({ ...form, employee: Number(e.target.value) })
           }
         >
           <option value="">Select Employee</option>
@@ -78,13 +94,12 @@ function Attendance() {
           ))}
         </select>
 
-        {/* ✅ DATE – ONLY TODAY ALLOWED */}
         <input
           type="date"
           value={form.date}
           min={today}
           max={today}
-          onChange={(e) => setForm({ ...form, date: e.target.value })}           
+          onChange={(e) => setForm({ ...form, date: e.target.value })}
         />
 
         <select
@@ -100,7 +115,7 @@ function Attendance() {
 
       <h2>Attendance Records</h2>
 
-      {/* ✅ Date Filter Section */}
+      {/* ✅ FILTER */}
       <div style={{ marginBottom: "20px" }}>
         <input
           type="date"
@@ -115,11 +130,11 @@ function Attendance() {
         </button>
       </div>
 
-      {/* ✅ Attendance Table */}
+      {/* ✅ TABLE */}
       {attendance.length === 0 ? (
         <p>No records found</p>
       ) : (
-        <table className="attendance-table">
+        <table border="1" cellPadding="8">
           <thead>
             <tr>
               <th>Employee</th>
@@ -131,32 +146,18 @@ function Attendance() {
             {attendance.map((att) => (
               <tr key={att.id}>
                 <td>
-                  <Link
-                    to={`/attendance/${att.employee}`}
-                    style={{
-                      textDecoration: "none",
-                      fontWeight: "bold",
-                      color: "#007bff",
-                    }}
-                  >
-                    {att.employee_name}
+                  <Link to={`/attendance/${att.employee}`}>
+                    {att.employee_name || "Employee"}
                   </Link>
                 </td>
                 <td>{att.date}</td>
-                <td>
-                  <span
-                    style={{
-                      padding: "5px 10px",
-                      borderRadius: "6px",
-                      backgroundColor:
-                        att.status === "Present" ? "#d4edda" : "#f8d7da",
-                      color:
-                        att.status === "Present" ? "green" : "red",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {att.status}
-                  </span>
+                <td
+                  style={{
+                    color: att.status === "Present" ? "green" : "red",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {att.status}
                 </td>
               </tr>
             ))}
