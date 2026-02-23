@@ -32,12 +32,58 @@ function Dashboard() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Dashboard</h1>
+    <div style={{ padding: "30px" }}>
+      <h1 style={{ marginBottom: "25px" }}>Dashboard</h1>
 
-      <p>Total Employees: {totalEmployees}</p>
-      <p>Total Present: {totalPresent}</p>
-      <p>Total Attendance: {totalAttendance}</p>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "20px",
+        }}
+      >
+        {/* Total Employees */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #007bff, #00c6ff)",
+            color: "#fff",
+            padding: "20px",
+            borderRadius: "12px",
+            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+          }}
+        >
+          <h3>Total Employees</h3>
+          <h1>{totalEmployees}</h1>
+        </div>
+
+        {/* Total Present */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #28a745, #7dff9c)",
+            color: "#fff",
+            padding: "20px",
+            borderRadius: "12px",
+            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+          }}
+        >
+          <h3>Total Present</h3>
+          <h1>{totalPresent}</h1>
+        </div>
+
+        {/* Total Attendance */}
+        <div
+          style={{
+            background: "linear-gradient(135deg, #6f42c1, #b28cff)",
+            color: "#fff",
+            padding: "20px",
+            borderRadius: "12px",
+            boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+          }}
+        >
+          <h3>Total Attendance</h3>
+          <h1>{totalAttendance}</h1>
+        </div>
+      </div>
     </div>
   );
 }
