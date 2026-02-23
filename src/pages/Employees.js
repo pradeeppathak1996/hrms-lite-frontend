@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Employees() {
+
   const [employees, setEmployees] = useState([]);
 
   const [form, setForm] = useState({
@@ -12,56 +13,98 @@ function Employees() {
   });
 
   const fetchEmployees = async () => {
-    try {
-      const res = await API.get("employees/");
-      // ✅ BACKEND returns ARRAY
-      setEmployees(Array.isArray(res.data) ? res.data : []);
-    } catch (error) {
-      alert("Error fetching employees");
-      console.error(error);
-    }
-  };
+  try {
+    const res = await API.get("employees/");
+    setEmployees(res.data);  
+  } catch {
+    alert("Error fetching employees");
+  }
+};
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
+  const validateForm = () => {
+
+    const nameRegex = /^[A-Za-z ]+$/;
+    const deptRegex = /^[A-Za-z ]+$/;
+    const emailRegex = /^[\w.-]+@[\w.-]+\.\w+$/;
+    const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
+
+    if (!idRegex.test(form.employee_id)) {
+      alert("Employee ID must contain both letters and numbers (Example: EMP001)");
+      return false;
+    }
+
+    if (!nameRegex.test(form.full_name)) {
+      alert("Name should contain only letters");
+      return false;
+    }
+
+    if (!emailRegex.test(form.email)) {
+      alert("Enter valid email address");
+      return false;
+    }
+
+    if (!deptRegex.test(form.department)) {
+      alert("Department should contain only letters");
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) return;
 
     try {
       await API.post("employees/", form);
       fetchEmployees();
+
       setForm({
         employee_id: "",
         full_name: "",
         email: "",
         department: "",
       });
-      alert("Employee added");
-    } catch (err) {
-      alert("Error adding employee");
+
+      alert("Employee Added Successfully");
+    } catch (error) {
+      alert(error.response?.data?.employee_id || "Error adding employee");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete?")) return;
-    await API.delete(`employees/${id}/`);
-    fetchEmployees();
+    if (window.confirm("Are you sure you want to delete?")) {
+      try {
+        await API.delete(`employees/${id}/`);
+        fetchEmployees();
+      } catch (error) {
+        alert("Error deleting employee");
+      }
+    }
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Add Employee</h2>
+      <h2>Add Employee Details</h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="employee-form">
+
         <input
           placeholder="Employee ID"
           value={form.employee_id}
           onChange={(e) =>
-            setForm({ ...form, employee_id: e.target.value })
+            setForm({
+              ...form,
+              employee_id: e.target.value.toUpperCase()
+            })
           }
         />
+
         <input
           placeholder="Full Name"
           value={form.full_name}
@@ -69,6 +112,7 @@ function Employees() {
             setForm({ ...form, full_name: e.target.value })
           }
         />
+
         <input
           placeholder="Email"
           value={form.email}
@@ -76,6 +120,7 @@ function Employees() {
             setForm({ ...form, email: e.target.value })
           }
         />
+
         <input
           placeholder="Department"
           value={form.department}
@@ -83,7 +128,11 @@ function Employees() {
             setForm({ ...form, department: e.target.value })
           }
         />
-        <button type="submit">Add</button>
+
+        <button type="submit" className="add-btn">
+          Add Employee
+        </button>
+
       </form>
 
       <h2>Employee List</h2>
@@ -91,13 +140,13 @@ function Employees() {
       {employees.length === 0 ? (
         <p>No employees found</p>
       ) : (
-        <table border="1">
+        <table className="employee-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
               <th>Email</th>
-              <th>Dept</th>
+              <th>Department</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -109,7 +158,10 @@ function Employees() {
                 <td>{emp.email}</td>
                 <td>{emp.department}</td>
                 <td>
-                  <button onClick={() => handleDelete(emp.id)}>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(emp.id)}
+                  >
                     Delete
                   </button>
                 </td>
