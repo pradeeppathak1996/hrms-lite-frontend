@@ -7,12 +7,12 @@ function Attendance() {
   const [employees, setEmployees] = useState([]);
   const [filterDate, setFilterDate] = useState("");
 
-  // ✅ LOCAL DATE (IST safe)
+
   const today = new Date().toLocaleDateString("en-CA"); 
 
   const [form, setForm] = useState({
     employee: "",
-    date: today,          // ✅ auto set today
+    date: today,       
     status: "Present",
   });
 
@@ -21,13 +21,12 @@ function Attendance() {
     API.get("employees/").then((res) => setEmployees(res.data));
   }, []);
 
-  // 🔹 Fetch All Attendance
   const fetchAttendance = async () => {
     const res = await API.get("attendance/");
     setAttendance(res.data);
   };
 
-  // 🔹 Submit Attendance
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -40,7 +39,6 @@ function Attendance() {
       await API.post("attendance/", form);
       fetchAttendance();
 
-      // reset employee only, date remains today
       setForm({ employee: "", date: today, status: "Present" });
     } catch (err) {
       alert(
@@ -50,7 +48,6 @@ function Attendance() {
     }
   };
 
-  // 🔹 Filter By Date
   const handleFilter = async () => {
     if (!filterDate) {
       fetchAttendance();
