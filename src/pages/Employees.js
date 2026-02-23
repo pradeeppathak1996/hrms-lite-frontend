@@ -15,7 +15,8 @@ function Employees() {
   const fetchEmployees = async () => {
     try {
       const res = await API.get("employees/");
-      setEmployees(res.data);
+      // setEmployees(res.data);
+      setEmployees(response.data.results || []);
     } catch (error) {
       alert("Error fetching employees");
     }
