@@ -62,7 +62,7 @@ function Employees() {
     if (!validateForm()) return;
 
     try {
-      await API.post("employees/", form);
+      await API.post("/employees/", form);
       fetchEmployees();
 
       setForm({
