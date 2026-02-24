@@ -2,33 +2,45 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Dashboard() {
-  const [data, setData] = useState({
-    total_employees: 0,
-    total_attendance: 0,
-    total_present: 0,
-  });
+  const [summary, setSummary] = useState(null);
+  const [employeesCount, setEmployeesCount] = useState(0);
 
   useEffect(() => {
-    API.get("attendance/dashboard/").then((res) => {
-      setData(res.data);
-    });
+    fetchDashboard();
   }, []);
+
+  const fetchDashboard = async () => {
+    try {
+      // Employees count
+      const empRes = await API.get("/employees/");
+      setEmployeesCount(empRes.data.length);
+
+      // Attendance summary
+      const summaryRes = await API.get("/attendance/dashboard/");
+      setSummary(summaryRes.data);
+    } catch (error) {
+      console.error("Dashboard fetch error:", error);
+    }
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Dashboard</h2>
 
-      <div className="card-container">
+      <div className="dashboard-cards">
         <div className="card blue">
-          Total Employees: {data.total_employees}
+          <h3>Total Employees:</h3>
+          <p>{employeesCount}</p>
+        </div>
+
+        <div className="card purple">
+          <h3>Total Present:</h3>
+          <p>{summary ? summary.present : 0}</p>
         </div>
 
         <div className="card green">
-          Total Present: {data.total_present}
-        </div>
-
-        <div className="card red">
-          Total Attendance: {data.total_attendance}
+          <h3>Total Attendance:</h3>
+          <p>{summary ? summary.total_records : 0}</p>
         </div>
       </div>
     </div>
