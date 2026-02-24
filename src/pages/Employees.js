@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Employees() {
-  const [employees, setEmployees] = useState([]); 
-  const [loading, setLoading] = useState(true);   
-  const [error, setError] = useState(null);    
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [form, setForm] = useState({
     employee_id: "",
@@ -13,19 +13,21 @@ function Employees() {
     department: "",
   });
 
+  // 🔹 Fetch Employees
   const fetchEmployees = async () => {
     try {
       setLoading(true);
       const res = await API.get("/employees/");
 
-      let data = [];
+      // Defensive handling
       if (Array.isArray(res.data)) {
-        data = res.data;
+        setEmployees(res.data);
       } else if (Array.isArray(res.data.employees)) {
-        data = res.data.employees;
+        setEmployees(res.data.employees);
+      } else {
+        setEmployees([]);
       }
 
-      setEmployees(data);
       setError(null);
     } catch (err) {
       console.error("FETCH EMPLOYEES ERROR:", err);
@@ -40,6 +42,7 @@ function Employees() {
     fetchEmployees();
   }, []);
 
+  // 🔹 Form Validation
   const validateForm = () => {
     const nameRegex = /^[A-Za-z ]+$/;
     const deptRegex = /^[A-Za-z ]+$/;
@@ -55,7 +58,7 @@ function Employees() {
       return false;
     }
     if (!emailRegex.test(form.email)) {
-      alert("Enter valid email address");
+      alert("Enter a valid email address");
       return false;
     }
     if (!deptRegex.test(form.department)) {
@@ -65,7 +68,7 @@ function Employees() {
     return true;
   };
 
-  // 🔹 Add Employee
+  // 🔹 Add Employee (FIXED ERROR HANDLING)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -81,22 +84,30 @@ function Employees() {
         department: "",
       });
 
-      alert("Employee Added Successfully");
+      alert("Employee added successfully");
     } catch (err) {
-      console.error("ADD EMPLOYEE ERROR:", err);
-      alert("Error adding employee");
+      console.error("ADD EMPLOYEE ERROR:", err.response?.data);
+
+      const message =
+        err.response?.data?.employee_id?.[0] ||
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.detail ||
+        "Failed to add employee";
+
+      alert(message);
     }
   };
 
+  // 🔹 Delete Employee
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete?")) return;
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
 
     try {
       await API.delete(`/employees/${id}/`);
       await fetchEmployees();
     } catch (err) {
       console.error("DELETE EMPLOYEE ERROR:", err);
-      alert("Error deleting employee");
+      alert("Failed to delete employee");
     }
   };
 
@@ -144,7 +155,6 @@ function Employees() {
 
       <h2>Employee List</h2>
 
-      {/* 🔹 SAFE RENDERING */}
       {loading ? (
         <p>Loading employees...</p>
       ) : error ? (
