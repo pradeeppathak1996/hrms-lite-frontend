@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Employees() {
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState([]); // ALWAYS ARRAY
+  const [loading, setLoading] = useState(true);   // 🔹 safety
+  const [error, setError] = useState(null);        // 🔹 safety
 
   const [form, setForm] = useState({
     employee_id: "",
@@ -11,21 +13,34 @@ function Employees() {
     department: "",
   });
 
-  // 🔹 Fetch Employees
+  // 🔹 Fetch Employees (DEFENSIVE & SAFE)
   const fetchEmployees = async () => {
     try {
+      setLoading(true);
       const res = await API.get("/employees/");
-      setEmployees(res.data); 
-    } catch (error) {
-      console.error(error);
-      alert("Error fetching employees");
+
+      // 🔥 SAFETY: normalize response
+      let data = [];
+      if (Array.isArray(res.data)) {
+        data = res.data;
+      } else if (Array.isArray(res.data.employees)) {
+        data = res.data.employees;
+      }
+
+      setEmployees(data);
+      setError(null);
+    } catch (err) {
+      console.error("FETCH EMPLOYEES ERROR:", err);
+      setEmployees([]);
+      setError("Failed to load employees");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchEmployees();
   }, []);
-  console.log("EMPLOYEES STATE:", employees);
 
   // 🔹 Form Validation
   const validateForm = () => {
@@ -38,22 +53,18 @@ function Employees() {
       alert("Employee ID must contain letters & numbers (e.g. EMP001)");
       return false;
     }
-
     if (!nameRegex.test(form.full_name)) {
       alert("Name should contain only letters");
       return false;
     }
-
     if (!emailRegex.test(form.email)) {
       alert("Enter valid email address");
       return false;
     }
-
     if (!deptRegex.test(form.department)) {
       alert("Department should contain only letters");
       return false;
     }
-
     return true;
   };
 
@@ -63,8 +74,8 @@ function Employees() {
     if (!validateForm()) return;
 
     try {
-      await API.post("/employees/", form); 
-      fetchEmployees();
+      await API.post("/employees/", form);
+      await fetchEmployees();
 
       setForm({
         employee_id: "",
@@ -74,8 +85,8 @@ function Employees() {
       });
 
       alert("Employee Added Successfully");
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error("ADD EMPLOYEE ERROR:", err);
       alert("Error adding employee");
     }
   };
@@ -85,10 +96,10 @@ function Employees() {
     if (!window.confirm("Are you sure you want to delete?")) return;
 
     try {
-      await API.delete(`/employees/${id}/`); // ✅ CORRECT
-      fetchEmployees();
-    } catch (error) {
-      console.error(error);
+      await API.delete(`/employees/${id}/`);
+      await fetchEmployees();
+    } catch (err) {
+      console.error("DELETE EMPLOYEE ERROR:", err);
       alert("Error deleting employee");
     }
   };
@@ -137,7 +148,12 @@ function Employees() {
 
       <h2>Employee List</h2>
 
-      {employees.length === 0 ? (
+      {/* 🔹 SAFE RENDERING */}
+      {loading ? (
+        <p>Loading employees...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : employees.length === 0 ? (
         <p>No employees found</p>
       ) : (
         <table className="employee-table">
