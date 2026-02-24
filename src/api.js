@@ -1,4 +1,3 @@
-// src/api.js  (TEMPORARY HARD FIX)
 import axios from "axios";
 
 const API = axios.create({

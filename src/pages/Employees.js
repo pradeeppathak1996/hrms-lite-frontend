@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Employees() {
-  const [employees, setEmployees] = useState([]); // ALWAYS ARRAY
-  const [loading, setLoading] = useState(true);   // 🔹 safety
-  const [error, setError] = useState(null);        // 🔹 safety
+  const [employees, setEmployees] = useState([]); 
+  const [loading, setLoading] = useState(true);   
+  const [error, setError] = useState(null);    
 
   const [form, setForm] = useState({
     employee_id: "",
@@ -13,13 +13,11 @@ function Employees() {
     department: "",
   });
 
-  // 🔹 Fetch Employees (DEFENSIVE & SAFE)
   const fetchEmployees = async () => {
     try {
       setLoading(true);
       const res = await API.get("/employees/");
 
-      // 🔥 SAFETY: normalize response
       let data = [];
       if (Array.isArray(res.data)) {
         data = res.data;
@@ -42,7 +40,6 @@ function Employees() {
     fetchEmployees();
   }, []);
 
-  // 🔹 Form Validation
   const validateForm = () => {
     const nameRegex = /^[A-Za-z ]+$/;
     const deptRegex = /^[A-Za-z ]+$/;
@@ -91,7 +88,6 @@ function Employees() {
     }
   };
 
-  // 🔹 Delete Employee
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete?")) return;
 
