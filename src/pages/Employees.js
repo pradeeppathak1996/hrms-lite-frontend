@@ -13,13 +13,11 @@ function Employees() {
     department: "",
   });
 
-  // 🔹 Fetch Employees
   const fetchEmployees = async () => {
     try {
       setLoading(true);
       const res = await API.get("/employees/");
 
-      // Defensive handling
       if (Array.isArray(res.data)) {
         setEmployees(res.data);
       } else if (Array.isArray(res.data.employees)) {
@@ -42,7 +40,6 @@ function Employees() {
     fetchEmployees();
   }, []);
 
-  // 🔹 Form Validation
   const validateForm = () => {
     const nameRegex = /^[A-Za-z ]+$/;
     const deptRegex = /^[A-Za-z ]+$/;
@@ -68,7 +65,6 @@ function Employees() {
     return true;
   };
 
-  // 🔹 Add Employee (FIXED ERROR HANDLING)
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -98,7 +94,6 @@ function Employees() {
     }
   };
 
-  // 🔹 Delete Employee
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this employee?")) return;
 
