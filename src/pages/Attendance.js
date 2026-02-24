@@ -7,12 +7,11 @@ function Attendance() {
   const [employees, setEmployees] = useState([]);
   const [filterDate, setFilterDate] = useState("");
 
-  // ✅ LOCAL DATE (IST safe)
   const today = new Date().toLocaleDateString("en-CA"); 
 
   const [form, setForm] = useState({
     employee: "",
-    date: today,          // ✅ auto set today
+    date: today,    
     status: "Present",
   });
 
@@ -21,13 +20,11 @@ function Attendance() {
     API.get("employees/").then((res) => setEmployees(res.data));
   }, []);
 
-  // 🔹 Fetch All Attendance
   const fetchAttendance = async () => {
      const res = await API.get("attendance/");
      setAttendance(res.data);
   };
 
-  // 🔹 Submit Attendance
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -40,7 +37,6 @@ function Attendance() {
       await API.post("attendance/", form);
       fetchAttendance();
 
-      // reset employee only, date remains today
       setForm({ employee: "", date: today, status: "Present" });
     } catch (err) {
       alert(
@@ -50,7 +46,6 @@ function Attendance() {
     }
   };
 
-  // 🔹 Filter By Date
   const handleFilter = async () => {
     if (!filterDate) {
       fetchAttendance();
@@ -81,7 +76,7 @@ function Attendance() {
           ))}
         </select>
 
-        {/* ✅ DATE – ONLY TODAY ALLOWED */}
+        {/* DATE */}
         <input
           type="date"
           value={form.date}
@@ -103,7 +98,7 @@ function Attendance() {
 
       <h2>Attendance Records</h2>
 
-      {/* ✅ Date Filter Section */}
+      {/*  Date Filter Section */}
       <div style={{ marginBottom: "20px" }}>
         <input
           type="date"
@@ -118,7 +113,7 @@ function Attendance() {
         </button>
       </div>
 
-      {/* ✅ Attendance Table */}
+      {/*  Attendance Table */}
       {attendance.length === 0 ? (
         <p>No records found</p>
       ) : (
