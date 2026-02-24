@@ -25,6 +25,7 @@ function Employees() {
   useEffect(() => {
     fetchEmployees();
   }, []);
+  console.log("EMPLOYEES STATE:", employees);
 
   // 🔹 Form Validation
   const validateForm = () => {
