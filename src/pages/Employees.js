@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import API from "../api";
 
 function Employees() {
-
   const [employees, setEmployees] = useState([]);
 
   const [form, setForm] = useState({
@@ -12,29 +11,30 @@ function Employees() {
     department: "",
   });
 
+  // 🔹 Fetch Employees
   const fetchEmployees = async () => {
-  try {
-    const res = await API.get("employees/");
-    setEmployees(res.data.employees || []);
-    // setEmployees(res.data);  
-  } catch {
-    alert("Error fetching employees");
-  }
-};
+    try {
+      const res = await API.get("/employees/");
+      setEmployees(res.data); 
+    } catch (error) {
+      console.error(error);
+      alert("Error fetching employees");
+    }
+  };
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
+  // 🔹 Form Validation
   const validateForm = () => {
-
     const nameRegex = /^[A-Za-z ]+$/;
     const deptRegex = /^[A-Za-z ]+$/;
     const emailRegex = /^[\w.-]+@[\w.-]+\.\w+$/;
     const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
 
     if (!idRegex.test(form.employee_id)) {
-      alert("Employee ID must contain both letters and numbers (Example: EMP001)");
+      alert("Employee ID must contain letters & numbers (e.g. EMP001)");
       return false;
     }
 
@@ -56,13 +56,13 @@ function Employees() {
     return true;
   };
 
+  // 🔹 Add Employee
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
-      await API.post("/employees/", form);
+      await API.post("/employees/", form); 
       fetchEmployees();
 
       setForm({
@@ -74,18 +74,21 @@ function Employees() {
 
       alert("Employee Added Successfully");
     } catch (error) {
-      alert(error.response?.data?.employee_id || "Error adding employee");
+      console.error(error);
+      alert("Error adding employee");
     }
   };
 
+  // 🔹 Delete Employee
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete?")) {
-      try {
-        await API.delete(`employees/${id}/`);
-        fetchEmployees();
-      } catch (error) {
-        alert("Error deleting employee");
-      }
+    if (!window.confirm("Are you sure you want to delete?")) return;
+
+    try {
+      await API.delete(`/employees/${id}/`); // ✅ CORRECT
+      fetchEmployees();
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting employee");
     }
   };
 
@@ -94,15 +97,11 @@ function Employees() {
       <h2>Add Employee Details</h2>
 
       <form onSubmit={handleSubmit} className="employee-form">
-
         <input
           placeholder="Employee ID"
           value={form.employee_id}
           onChange={(e) =>
-            setForm({
-              ...form,
-              employee_id: e.target.value.toUpperCase()
-            })
+            setForm({ ...form, employee_id: e.target.value.toUpperCase() })
           }
         />
 
@@ -133,7 +132,6 @@ function Employees() {
         <button type="submit" className="add-btn">
           Add Employee
         </button>
-
       </form>
 
       <h2>Employee List</h2>
@@ -152,23 +150,22 @@ function Employees() {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(employees) &&
-              employees.map((emp) => (
-                <tr key={emp.id}>
-                  <td>{emp.employee_id}</td>
-                  <td>{emp.full_name}</td>
-                  <td>{emp.email}</td>
-                  <td>{emp.department}</td>
-                  <td>
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDelete(emp.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {employees.map((emp) => (
+              <tr key={emp.id}>
+                <td>{emp.employee_id}</td>
+                <td>{emp.full_name}</td>
+                <td>{emp.email}</td>
+                <td>{emp.department}</td>
+                <td>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(emp.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       )}
