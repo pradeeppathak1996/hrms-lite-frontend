@@ -15,7 +15,8 @@ function Employees() {
   const fetchEmployees = async () => {
   try {
     const res = await API.get("employees/");
-    setEmployees(res.data);  
+    setEmployees(res.data.employees || []);
+    // setEmployees(res.data);  
   } catch {
     alert("Error fetching employees");
   }
@@ -151,22 +152,23 @@ function Employees() {
             </tr>
           </thead>
           <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.id}>
-                <td>{emp.employee_id}</td>
-                <td>{emp.full_name}</td>
-                <td>{emp.email}</td>
-                <td>{emp.department}</td>
-                <td>
-                  <button
-                    className="delete-btn"
-                    onClick={() => handleDelete(emp.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {Array.isArray(employees) &&
+              employees.map((emp) => (
+                <tr key={emp.id}>
+                  <td>{emp.employee_id}</td>
+                  <td>{emp.full_name}</td>
+                  <td>{emp.email}</td>
+                  <td>{emp.department}</td>
+                  <td>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(emp.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       )}
