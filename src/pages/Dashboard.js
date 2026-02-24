@@ -25,7 +25,7 @@ function Dashboard() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Dashboard</h2>
+      <h2>HRMS Dashboard</h2>
 
       <div className="dashboard-cards">
         <div className="card blue">
