@@ -16,6 +16,7 @@ function Employees() {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
+
       const res = await API.get("/employees/");
 
       if (Array.isArray(res.data)) {
@@ -47,30 +48,36 @@ function Employees() {
     const idRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
 
     if (!idRegex.test(form.employee_id)) {
-      alert("Employee ID must contain letters & numbers (e.g. EMP001)");
+      alert("Employee ID must contain letters & numbers (Example: EMP001)");
       return false;
     }
+
     if (!nameRegex.test(form.full_name)) {
       alert("Name should contain only letters");
       return false;
     }
+
     if (!emailRegex.test(form.email)) {
-      alert("Enter a valid email address");
+      alert("Enter valid email address");
       return false;
     }
+
     if (!deptRegex.test(form.department)) {
       alert("Department should contain only letters");
       return false;
     }
+
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateForm()) return;
 
     try {
       await API.post("/employees/", form);
+
       await fetchEmployees();
 
       setForm({
@@ -95,27 +102,36 @@ function Employees() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) return;
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+
+    if (!confirmDelete) return;
 
     try {
       await API.delete(`/employees/${id}/`);
       await fetchEmployees();
     } catch (err) {
-      console.error("DELETE EMPLOYEE ERROR:", err);
+      console.error("DELETE ERROR:", err);
       alert("Failed to delete employee");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container">
+
       <h2>Add Employee Details</h2>
 
-      <form onSubmit={handleSubmit} className="employee-form">
+      <form onSubmit={handleSubmit}>
+
         <input
           placeholder="Employee ID"
           value={form.employee_id}
           onChange={(e) =>
-            setForm({ ...form, employee_id: e.target.value.toUpperCase() })
+            setForm({
+              ...form,
+              employee_id: e.target.value.toUpperCase(),
+            })
           }
         />
 
@@ -123,7 +139,10 @@ function Employees() {
           placeholder="Full Name"
           value={form.full_name}
           onChange={(e) =>
-            setForm({ ...form, full_name: e.target.value })
+            setForm({
+              ...form,
+              full_name: e.target.value,
+            })
           }
         />
 
@@ -131,7 +150,10 @@ function Employees() {
           placeholder="Email"
           value={form.email}
           onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
+            setForm({
+              ...form,
+              email: e.target.value,
+            })
           }
         />
 
@@ -139,25 +161,41 @@ function Employees() {
           placeholder="Department"
           value={form.department}
           onChange={(e) =>
-            setForm({ ...form, department: e.target.value })
+            setForm({
+              ...form,
+              department: e.target.value,
+            })
           }
         />
 
-        <button type="submit" className="add-btn">
-          Add Employee
-        </button>
+        <button type="submit">Add Employee</button>
+
       </form>
 
       <h2>Employee List</h2>
 
-      {loading ? (
-        <p>Loading employees...</p>
-      ) : error ? (
+      {/* LOADING STATE */}
+
+      {loading && <p className="loading">Loading employees...</p>}
+
+      {/* ERROR STATE */}
+
+      {!loading && error && (
         <p style={{ color: "red" }}>{error}</p>
-      ) : employees.length === 0 ? (
-        <p>No employees found</p>
-      ) : (
+      )}
+
+      {/* EMPTY STATE */}
+
+      {!loading && !error && employees.length === 0 && (
+        <p>No employees found. Please add employee.</p>
+      )}
+
+      {/* EMPLOYEE TABLE */}
+
+      {!loading && !error && employees.length > 0 && (
+
         <table className="employee-table">
+
           <thead>
             <tr>
               <th>ID</th>
@@ -167,13 +205,18 @@ function Employees() {
               <th>Action</th>
             </tr>
           </thead>
+
           <tbody>
+
             {employees.map((emp) => (
+
               <tr key={emp.id}>
+
                 <td>{emp.employee_id}</td>
                 <td>{emp.full_name}</td>
                 <td>{emp.email}</td>
                 <td>{emp.department}</td>
+
                 <td>
                   <button
                     className="delete-btn"
@@ -190,4 +233,5 @@ function Employees() {
     </div>
   );
 }
+
 export default Employees;
