@@ -3,7 +3,8 @@ import API from "../api";
 
 function Dashboard() {
   const [summary, setSummary] = useState(null);
-  const [employeesCount, setEmployeesCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchDashboard();
@@ -11,15 +12,17 @@ function Dashboard() {
 
   const fetchDashboard = async () => {
     try {
-      // Employees count
-      const empRes = await API.get("/employees/");
-      setEmployeesCount(empRes.data.length);
+      setLoading(true);
 
-      // Attendance summary
-      const summaryRes = await API.get("/attendance/dashboard/");
-      setSummary(summaryRes.data);
-    } catch (error) {
-      console.error("Dashboard fetch error:", error);
+      const res = await API.get("/attendance/dashboard/");
+      setSummary(res.data);
+
+      setError(null);
+    } catch (err) {
+      console.error("Dashboard fetch error:", err);
+      setError("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,24 +30,29 @@ function Dashboard() {
     <div style={{ padding: "20px" }}>
       <h2>HRMS Dashboard</h2>
 
-      <div className="dashboard-cards">
-        <div className="card blue">
-          <h3>Total Employees:</h3>
-          <p>{employeesCount}</p>
-        </div>
+      {loading ? (
+        <p>Loading dashboard...</p>
+      ) : error ? (
+        <p style={{ color: "red" }}>{error}</p>
+      ) : (
+        <div className="dashboard-cards">
+          <div className="card blue">
+            <h3>Total Employees</h3>
+            <p>{summary?.total_employees || 0}</p>
+          </div>
 
-        <div className="card purple">
-          <h3>Total Present:</h3>
-          <p>{summary ? summary.present : 0}</p>
-        </div>
+          <div className="card purple">
+            <h3>Total Present</h3>
+            <p>{summary?.present || 0}</p>
+          </div>
 
-        <div className="card green">
-          <h3>Total Attendance:</h3>
-          <p>{summary ? summary.total_records : 0}</p>
+          <div className="card green">
+            <h3>Total Attendance</h3>
+            <p>{summary?.total_records || 0}</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
-
 export default Dashboard;

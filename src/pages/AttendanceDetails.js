@@ -38,7 +38,6 @@ function AttendanceDetails() {
       <h2>Attendance Details</h2>
       <h3 style={{ color: "#007bff" }}>{data.employee_name}</h3>
 
-      {/* Summary Box */}
       <div
         style={{
           marginBottom: "20px",
@@ -62,7 +61,6 @@ function AttendanceDetails() {
         </p>
       </div>
 
-      {/* Table */}
       {data.records.length === 0 ? (
         <p>No attendance records found.</p>
       ) : (
@@ -99,5 +97,4 @@ function AttendanceDetails() {
     </div>
   );
 }
-
 export default AttendanceDetails;

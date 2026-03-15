@@ -60,7 +60,6 @@ function Attendance() {
     <div style={{ padding: "20px" }}>
       <h2>Mark Attendance</h2>
 
-      {/* ✅ Attendance Form */}
       <form onSubmit={handleSubmit} style={{ marginBottom: "30px" }}>
         <select
           value={form.employee}
@@ -76,7 +75,6 @@ function Attendance() {
           ))}
         </select>
 
-        {/* DATE */}
         <input
           type="date"
           value={form.date}
@@ -98,7 +96,6 @@ function Attendance() {
 
       <h2>Attendance Records</h2>
 
-      {/*  Date Filter Section */}
       <div style={{ marginBottom: "20px" }}>
         <input
           type="date"
@@ -113,7 +110,6 @@ function Attendance() {
         </button>
       </div>
 
-      {/*  Attendance Table */}
       {attendance.length === 0 ? (
         <p>No records found</p>
       ) : (
@@ -164,5 +160,4 @@ function Attendance() {
     </div>
   );
 }
-
 export default Attendance;
