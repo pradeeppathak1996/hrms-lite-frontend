@@ -1,4 +1,4 @@
-/* DASHBOARD CARDS */
+/* ===== DASHBOARD FIX ===== */
 
 .dashboard-cards {
   display: flex;
@@ -10,21 +10,34 @@
 .dashboard-cards .card {
   flex: 1;
   min-width: 250px;
+  padding: 25px;
+  border-radius: 12px;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  transition: 0.3s;
 }
 
-.blue {
+.dashboard-cards .card:hover {
+  transform: translateY(-5px);
+}
+
+/* CARD COLORS */
+
+.dashboard-cards .blue {
   background: linear-gradient(135deg, #3b82f6, #1e40af);
 }
 
-.purple {
+.dashboard-cards .purple {
   background: linear-gradient(135deg, #8b5cf6, #6d28d9);
 }
 
-.green {
+.dashboard-cards .green {
   background: linear-gradient(135deg, #10b981, #047857);
 }
 
-.card p {
+.dashboard-cards .card p {
   font-size: 32px;
   margin-top: 10px;
+  font-weight: bold;
 }
