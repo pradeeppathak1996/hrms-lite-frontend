@@ -27,11 +27,11 @@ function Dashboard() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="container">
       <h2>HRMS Dashboard</h2>
 
       {loading ? (
-        <p>Loading dashboard...</p>
+        <p className="loading">Loading dashboard...</p>
       ) : error ? (
         <p style={{ color: "red" }}>{error}</p>
       ) : (
@@ -55,4 +55,5 @@ function Dashboard() {
     </div>
   );
 }
+
 export default Dashboard;
